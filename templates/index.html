@@ -32,29 +32,37 @@
             </div>
 
             <div class="activity-grid">
-                <button type="button" class="activity-card card-question selected"
-                        data-activity="qa" aria-pressed="true">
+                <button type="button"
+                        class="activity-card card-question selected"
+                        data-activity="qa"
+                        aria-pressed="true">
                     <span class="activity-icon">💬</span>
                     <span class="activity-title">Ask a Question</span>
                     <span class="activity-description">Get answers to your doubts.</span>
                 </button>
 
-                <button type="button" class="activity-card card-quiz"
-                        data-activity="quiz" aria-pressed="false">
+                <button type="button"
+                        class="activity-card card-quiz"
+                        data-activity="quiz"
+                        aria-pressed="false">
                     <span class="activity-icon">🧠</span>
                     <span class="activity-title">Generate a Quiz</span>
                     <span class="activity-description">Practise with multiple-choice questions.</span>
                 </button>
 
-                <button type="button" class="activity-card card-summary"
-                        data-activity="summary" aria-pressed="false">
+                <button type="button"
+                        class="activity-card card-summary"
+                        data-activity="summary"
+                        aria-pressed="false">
                     <span class="activity-icon">📄</span>
                     <span class="activity-title">Summarize Passages</span>
                     <span class="activity-description">Turn long notes into key points.</span>
                 </button>
 
-                <button type="button" class="activity-card card-path"
-                        data-activity="path" aria-pressed="false">
+                <button type="button"
+                        class="activity-card card-path"
+                        data-activity="path"
+                        aria-pressed="false">
                     <span class="activity-icon">🌱</span>
                     <span class="activity-title">Personalized Learning Path</span>
                     <span class="activity-description">Create a step-by-step study plan.</span>
@@ -66,14 +74,21 @@
                     <span>✨</span>
                     <div>
                         <h2 id="workspaceTitle">Ask a Question</h2>
-                        <p id="workspaceDescription">What would you like to understand today?</p>
+                        <p id="workspaceDescription">
+                            What would you like to understand today?
+                        </p>
                     </div>
                 </div>
 
                 <form id="learningForm">
-                    <label for="userInput" id="inputLabel">Enter your question</label>
-                    <textarea id="userInput" rows="5" required
-                        placeholder="For example: Explain machine learning in simple words..."></textarea>
+                    <label for="userInput" id="inputLabel">
+                        Enter your question
+                    </label>
+
+                    <textarea id="userInput"
+                              rows="5"
+                              required
+                              placeholder="For example: Explain machine learning in simple words..."></textarea>
 
                     <div id="pathDetails" hidden>
                         <label for="level">Your current learning level</label>
@@ -84,20 +99,26 @@
                         </select>
 
                         <label for="goal">Your learning goal</label>
-                        <input id="goal" type="text"
-                            placeholder="For example: Prepare for my exam">
+                        <input id="goal"
+                               type="text"
+                               placeholder="For example: Prepare for my exam">
                     </div>
 
                     <p class="hint" id="activityHint">
                         ✨ Tip: Be specific to get a more useful answer.
                     </p>
 
-                    <button type="submit" class="submit-button" id="submitButton">
+                    <button type="submit"
+                            class="submit-button"
+                            id="submitButton">
                         Start learning <span>→</span>
                     </button>
                 </form>
 
-                <section id="result" class="result" aria-live="polite" hidden>
+                <section id="result"
+                         class="result"
+                         aria-live="polite"
+                         hidden>
                     <h2>Your learning result</h2>
                     <div id="resultText"></div>
                 </section>
@@ -110,11 +131,13 @@
                 <h3>Understand</h3>
                 <p>Explore concepts in simple language.</p>
             </article>
+
             <article class="feature feature-lavender">
                 <span>🧠</span>
                 <h3>Practise</h3>
                 <p>Test your knowledge with quizzes.</p>
             </article>
+
             <article class="feature feature-mint">
                 <span>🌱</span>
                 <h3>Grow</h3>
@@ -137,7 +160,8 @@
         const resultText = document.getElementById("resultText");
         const button = document.getElementById("submitButton");
         const workspaceTitle = document.getElementById("workspaceTitle");
-        const workspaceDescription = document.getElementById("workspaceDescription");
+        const workspaceDescription =
+            document.getElementById("workspaceDescription");
         const activityHint = document.getElementById("activityHint");
 
         let selectedActivity = "qa";
@@ -147,9 +171,11 @@
                 title: "Ask a Question",
                 description: "What would you like to understand today?",
                 label: "Enter your question",
-                placeholder: "For example: Explain machine learning in simple words...",
+                placeholder:
+                    "For example: Explain machine learning in simple words...",
                 hint: "✨ Tip: Be specific to get a more useful answer."
             },
+
             quiz: {
                 title: "Generate a Quiz",
                 description: "Test your knowledge with practice questions.",
@@ -157,6 +183,7 @@
                 placeholder: "For example: Python basics",
                 hint: "✨ EduGenie will generate 3 multiple-choice questions."
             },
+
             summary: {
                 title: "Summarize Passages",
                 description: "Turn your study material into a clear summary.",
@@ -164,6 +191,7 @@
                 placeholder: "Paste your notes or study passage here...",
                 hint: "✨ Tip: Include the complete passage for a more useful summary."
             },
+
             path: {
                 title: "Personalized Learning Path",
                 description: "Build a learning plan around your topic and goal.",
@@ -192,7 +220,7 @@
 
             userInput.value = "";
             result.hidden = true;
-            resultText.textContent = "";
+            resultText.replaceChildren();
         }
 
         activityCards.forEach(card => {
@@ -200,6 +228,179 @@
                 selectActivity(card.dataset.activity);
             });
         });
+
+        // Display the quiz without revealing the answer key.
+        function renderQuiz(quiz, quizId) {
+            const container = document.createElement("div");
+            container.className = "quiz-container";
+
+            const quizForm = document.createElement("form");
+            quizForm.className = "quiz-form";
+
+            const selectedAnswers = new Array(quiz.length);
+            const feedback = document.createElement("div");
+
+            feedback.className = "quiz-feedback";
+            feedback.setAttribute("aria-live", "polite");
+
+            quiz.forEach((item, questionIndex) => {
+                const questionBox = document.createElement("div");
+                questionBox.className = "quiz-question";
+
+                const heading = document.createElement("h3");
+                heading.textContent =
+                    `${questionIndex + 1}. ${item.question}`;
+
+                questionBox.appendChild(heading);
+
+                if (!Array.isArray(item.options)) {
+                    throw new Error("A quiz question has invalid options.");
+                }
+
+                item.options.forEach((option, optionIndex) => {
+                    const label = document.createElement("label");
+                    label.className = "quiz-option";
+
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = `question-${questionIndex}`;
+                    radio.value = String(optionIndex);
+                    radio.required = true;
+
+                    radio.addEventListener("change", () => {
+                        selectedAnswers[questionIndex] = optionIndex;
+                    });
+
+                    const optionText = document.createElement("span");
+                    optionText.textContent =
+                        `${String.fromCharCode(65 + optionIndex)}. ${option}`;
+
+                    label.append(radio, optionText);
+                    questionBox.appendChild(label);
+                    questionBox.appendChild(document.createElement("br"));
+                });
+
+                quizForm.appendChild(questionBox);
+            });
+
+            const submitButton = document.createElement("button");
+            submitButton.type = "submit";
+            submitButton.className = "submit-button";
+            submitButton.textContent = "Submit Quiz";
+
+            quizForm.appendChild(submitButton);
+
+            quizForm.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                if (
+                    selectedAnswers.length !== quiz.length ||
+                    selectedAnswers.some(answer => answer === undefined)
+                ) {
+                    feedback.textContent =
+                        "Please answer every question before submitting.";
+                    return;
+                }
+
+                submitButton.disabled = true;
+                feedback.textContent = "Checking your answers...";
+
+                try {
+                    const response = await fetch("/quiz/submit", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            quiz_id: quizId,
+                            answers: selectedAnswers
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            data.detail || "Unable to submit the quiz."
+                        );
+                    }
+
+                    if (
+                        typeof data.score !== "number" ||
+                        typeof data.total !== "number" ||
+                        !Array.isArray(data.results)
+                    ) {
+                        throw new Error(
+                            "The server returned an unexpected quiz result."
+                        );
+                    }
+
+                    feedback.replaceChildren();
+
+                    const scoreHeading = document.createElement("h3");
+                    scoreHeading.textContent =
+                        `Your Score: ${data.score} / ${data.total}`;
+
+                    feedback.appendChild(scoreHeading);
+
+                    const percentage = data.total > 0
+                        ? Math.round((data.score / data.total) * 100)
+                        : 0;
+
+                    const scoreMessage = document.createElement("p");
+                    scoreMessage.textContent =
+                        `You scored ${percentage}%. Keep learning and practising!`;
+
+                    feedback.appendChild(scoreMessage);
+
+                    data.results.forEach((item, index) => {
+                        const resultBox = document.createElement("div");
+                        resultBox.className = "quiz-result-item";
+
+                        const resultLine = document.createElement("p");
+                        resultLine.textContent =
+                            `Question ${index + 1}: ` +
+                            (item.correct ? "Correct ✓" : "Incorrect ✗");
+
+                        resultBox.appendChild(resultLine);
+
+                        if (!item.correct && item.correct_answer) {
+                            const correctAnswer = document.createElement("p");
+                            correctAnswer.textContent =
+                                `Correct answer: ${item.correct_answer}`;
+
+                            resultBox.appendChild(correctAnswer);
+                        }
+
+                        if (item.explanation) {
+                            const explanation = document.createElement("p");
+                            explanation.textContent =
+                                `Explanation: ${item.explanation}`;
+
+                            resultBox.appendChild(explanation);
+                        }
+
+                        feedback.appendChild(resultBox);
+                    });
+
+                    quizForm.querySelectorAll("input").forEach(input => {
+                        input.disabled = true;
+                    });
+
+                    submitButton.remove();
+
+                } catch (error) {
+                    feedback.textContent =
+                        error.message ||
+                        "Something went wrong while checking your answers.";
+
+                    submitButton.disabled = false;
+                }
+            });
+
+            container.append(quizForm, feedback);
+            return container;
+        }
 
         form.addEventListener("submit", async function (event) {
             event.preventDefault();
@@ -218,33 +419,47 @@
             if (selectedActivity === "qa") {
                 endpoint = "/qa?question=" + encodeURIComponent(input);
                 resultKey = "answer";
+
             } else if (selectedActivity === "quiz") {
                 endpoint = "/quiz?topic=" + encodeURIComponent(input);
                 resultKey = "quiz";
+
             } else if (selectedActivity === "summary") {
                 endpoint = "/summarize";
+
                 options = {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ passage: input })
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        passage: input
+                    })
                 };
+
                 resultKey = "summary";
+
             } else {
                 endpoint = "/learn/recommendations";
+
                 options = {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify({
                         topic: input,
                         level: level.value,
                         goal: goal.value.trim() || "Understand the topic"
                     })
                 };
+
                 resultKey = "learning_path";
             }
 
             button.disabled = true;
             button.textContent = "Preparing your result...";
+
             result.hidden = false;
             resultText.textContent =
                 "Please wait while EduGenie prepares your learning result.";
@@ -260,30 +475,31 @@
                 }
 
                 if (selectedActivity === "quiz") {
-                    if (!Array.isArray(data.quiz)) {
-                        throw new Error("The quiz response format was unexpected.");
+                    if (
+                        !Array.isArray(data.quiz) ||
+                        !data.quiz_id
+                    ) {
+                        throw new Error(
+                            "The quiz response must contain quiz and quiz_id. " +
+                            "The backend needs to be updated."
+                        );
                     }
 
-                    resultText.textContent = data.quiz.map((item, index) => {
-                        const choices = Array.isArray(item.options)
-                            ? item.options : [];
+                    resultText.replaceChildren(
+                        renderQuiz(data.quiz, data.quiz_id)
+                    );
 
-                        return "Question " + (index + 1) + ": " +
-                            item.question + "\n\n" +
-                            choices.map((option, i) =>
-                                String.fromCharCode(65 + i) + ". " + option
-                            ).join("\n") +
-                            "\n\nCorrect answer: " + item.answer;
-                    }).join("\n\n--------------------\n\n");
                 } else {
                     resultText.textContent =
                         data[resultKey] || "No result was returned.";
                 }
+
             } catch (error) {
                 resultText.textContent =
                     "We couldn't complete your request.\n\n" +
                     error.message +
                     "\n\nPlease check the server, API key, internet connection, and Gemini quota.";
+
             } finally {
                 button.disabled = false;
                 button.innerHTML = 'Start learning <span>→</span>';
