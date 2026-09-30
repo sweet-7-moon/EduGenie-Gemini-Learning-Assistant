@@ -1,3 +1,4 @@
+
 from pathlib import Path
 from uuid import uuid4
 
@@ -29,7 +30,7 @@ app.mount(
 )
 
 # Temporary server-side storage for generated quizzes.
-# Correct answers are not sent to the browser before submission.
+# Correct answers and explanations are not sent before submission.
 quiz_store = {}
 
 
@@ -87,7 +88,6 @@ def quiz(topic: str):
         )
 
     try:
-        # Keep the existing quiz-generation logic unchanged.
         generated_quiz = generate_quiz(topic)
 
         if not isinstance(generated_quiz, list) or not generated_quiz:
@@ -121,16 +121,27 @@ def quiz(topic: str):
             ):
                 raise ValueError("A quiz question has an invalid format.")
 
-            # Keep the correct answer on the server.
             correct_index = options.index(answer)
 
+            # Use the generated explanation when available.
+            explanation = item.get("explanation", "")
+
+            # Fallback if no explanation was generated.
+            if not isinstance(explanation, str) or not explanation.strip():
+                explanation = (
+                    f"The correct answer is '{answer}'. "
+                    f"It is the correct option for this question "
+                    f"about {topic}."
+                )
+
+            # Keep answers and explanations on the server.
             answer_key.append({
                 "correct_index": correct_index,
                 "correct_answer": answer,
-                "explanation": item.get("explanation", "")
+                "explanation": explanation
             })
 
-            # Send only the question and options to the browser.
+            # Only questions and options are sent to the browser.
             public_questions.append({
                 "question": question,
                 "options": options
@@ -199,16 +210,17 @@ def submit_quiz(request: QuizSubmitRequest):
             "correct": is_correct
         }
 
-        # Reveal the correct answer after submission when needed.
+        # Reveal the correct answer and explanation only
+        # when the submitted answer is incorrect.
         if not is_correct:
             result_item["correct_answer"] = (
                 answer_key[index]["correct_answer"]
             )
 
-        explanation = answer_key[index]["explanation"]
+            explanation = answer_key[index]["explanation"]
 
-        if isinstance(explanation, str) and explanation.strip():
-            result_item["explanation"] = explanation
+            if isinstance(explanation, str) and explanation.strip():
+                result_item["explanation"] = explanation
 
         results.append(result_item)
 
