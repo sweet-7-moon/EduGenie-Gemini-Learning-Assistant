@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGenie | AI Learning Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="hero">
+        <div class="brand">✦ EduGenie</div>
+        <p class="tagline">A little help for your big ideas.</p>
+        <div class="hero-badge">YOUR PERSONAL AI LEARNING SPACE</div>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <span class="welcome-icon">🌷</span>
+            <div>
+                <h1>What shall we learn today?</h1>
+                <p>Ask questions, understand concepts, and discover new things at your own pace.</p>
+            </div>
+        </section>
+
+        <section class="learning-card">
+            <div class="section-heading">
+                <span class="step-number">01</span>
+                <div>
+                    <h2>Your learning activity</h2>
+                    <p>Choose a card to get started.</p>
+                </div>
+            </div>
+
+            <div class="activity-grid">
+                <button type="button" class="activity-card card-question selected"
+                        data-activity="qa" aria-pressed="true">
+                    <span class="activity-icon">💬</span>
+                    <span class="activity-title">Ask a Question</span>
+                    <span class="activity-description">Get answers to your doubts.</span>
+                </button>
+
+                <button type="button" class="activity-card card-quiz"
+                        data-activity="quiz" aria-pressed="false">
+                    <span class="activity-icon">🧠</span>
+                    <span class="activity-title">Generate a Quiz</span>
+                    <span class="activity-description">Practise with multiple-choice questions.</span>
+                </button>
+
+                <button type="button" class="activity-card card-summary"
+                        data-activity="summary" aria-pressed="false">
+                    <span class="activity-icon">📄</span>
+                    <span class="activity-title">Summarize Passages</span>
+                    <span class="activity-description">Turn long notes into key points.</span>
+                </button>
+
+                <button type="button" class="activity-card card-path"
+                        data-activity="path" aria-pressed="false">
+                    <span class="activity-icon">🌱</span>
+                    <span class="activity-title">Personalized Learning Path</span>
+                    <span class="activity-description">Create a step-by-step study plan.</span>
+                </button>
+            </div>
+
+            <div class="workspace">
+                <div class="workspace-heading">
+                    <span>✨</span>
+                    <div>
+                        <h2 id="workspaceTitle">Ask a Question</h2>
+                        <p id="workspaceDescription">What would you like to understand today?</p>
+                    </div>
+                </div>
+
+                <form id="learningForm">
+                    <label for="userInput" id="inputLabel">Enter your question</label>
+                    <textarea id="userInput" rows="5" required
+                        placeholder="For example: Explain machine learning in simple words..."></textarea>
+
+                    <div id="pathDetails" hidden>
+                        <label for="level">Your current learning level</label>
+                        <select id="level">
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+
+                        <label for="goal">Your learning goal</label>
+                        <input id="goal" type="text"
+                            placeholder="For example: Prepare for my exam">
+                    </div>
+
+                    <p class="hint" id="activityHint">
+                        ✨ Tip: Be specific to get a more useful answer.
+                    </p>
+
+                    <button type="submit" class="submit-button" id="submitButton">
+                        Start learning <span>→</span>
+                    </button>
+                </form>
+
+                <section id="result" class="result" aria-live="polite" hidden>
+                    <h2>Your learning result</h2>
+                    <div id="resultText"></div>
+                </section>
+            </div>
+        </section>
+
+        <section class="feature-grid">
+            <article class="feature feature-peach">
+                <span>💡</span>
+                <h3>Understand</h3>
+                <p>Explore concepts in simple language.</p>
+            </article>
+            <article class="feature feature-lavender">
+                <span>🧠</span>
+                <h3>Practise</h3>
+                <p>Test your knowledge with quizzes.</p>
+            </article>
+            <article class="feature feature-mint">
+                <span>🌱</span>
+                <h3>Grow</h3>
+                <p>Take learning one step at a time.</p>
+            </article>
+        </section>
+    </main>
+
+    <footer>Made with ♡ for curious minds · EduGenie</footer>
+
+    <script>
+        const form = document.getElementById("learningForm");
+        const activityCards = document.querySelectorAll(".activity-card");
+        const userInput = document.getElementById("userInput");
+        const inputLabel = document.getElementById("inputLabel");
+        const pathDetails = document.getElementById("pathDetails");
+        const level = document.getElementById("level");
+        const goal = document.getElementById("goal");
+        const result = document.getElementById("result");
+        const resultText = document.getElementById("resultText");
+        const button = document.getElementById("submitButton");
+        const workspaceTitle = document.getElementById("workspaceTitle");
+        const workspaceDescription = document.getElementById("workspaceDescription");
+        const activityHint = document.getElementById("activityHint");
+
+        let selectedActivity = "qa";
+
+        const activitySettings = {
+            qa: {
+                title: "Ask a Question",
+                description: "What would you like to understand today?",
+                label: "Enter your question",
+                placeholder: "For example: Explain machine learning in simple words...",
+                hint: "✨ Tip: Be specific to get a more useful answer."
+            },
+            quiz: {
+                title: "Generate a Quiz",
+                description: "Test your knowledge with practice questions.",
+                label: "Enter a topic for your quiz",
+                placeholder: "For example: Python basics",
+                hint: "✨ EduGenie will generate 3 multiple-choice questions."
+            },
+            summary: {
+                title: "Summarize Passages",
+                description: "Turn your study material into a clear summary.",
+                label: "Paste the passage you want to summarize",
+                placeholder: "Paste your notes or study passage here...",
+                hint: "✨ Tip: Include the complete passage for a more useful summary."
+            },
+            path: {
+                title: "Personalized Learning Path",
+                description: "Build a learning plan around your topic and goal.",
+                label: "What topic do you want to learn?",
+                placeholder: "For example: Learn Python programming",
+                hint: "✨ Choose your level and goal to tailor your study plan."
+            }
+        };
+
+        function selectActivity(activity) {
+            selectedActivity = activity;
+            const settings = activitySettings[activity];
+
+            activityCards.forEach(card => {
+                const isSelected = card.dataset.activity === activity;
+                card.classList.toggle("selected", isSelected);
+                card.setAttribute("aria-pressed", String(isSelected));
+            });
+
+            workspaceTitle.textContent = settings.title;
+            workspaceDescription.textContent = settings.description;
+            inputLabel.textContent = settings.label;
+            userInput.placeholder = settings.placeholder;
+            activityHint.textContent = settings.hint;
+            pathDetails.hidden = activity !== "path";
+
+            userInput.value = "";
+            result.hidden = true;
+            resultText.textContent = "";
+        }
+
+        activityCards.forEach(card => {
+            card.addEventListener("click", () => {
+                selectActivity(card.dataset.activity);
+            });
+        });
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const input = userInput.value.trim();
+
+            if (!input) {
+                alert("Please enter your question, topic, or passage.");
+                return;
+            }
+
+            let endpoint;
+            let options = { method: "GET" };
+            let resultKey;
+
+            if (selectedActivity === "qa") {
+                endpoint = "/qa?question=" + encodeURIComponent(input);
+                resultKey = "answer";
+            } else if (selectedActivity === "quiz") {
+                endpoint = "/quiz?topic=" + encodeURIComponent(input);
+                resultKey = "quiz";
+            } else if (selectedActivity === "summary") {
+                endpoint = "/summarize";
+                options = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ passage: input })
+                };
+                resultKey = "summary";
+            } else {
+                endpoint = "/learn/recommendations";
+                options = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        topic: input,
+                        level: level.value,
+                        goal: goal.value.trim() || "Understand the topic"
+                    })
+                };
+                resultKey = "learning_path";
+            }
+
+            button.disabled = true;
+            button.textContent = "Preparing your result...";
+            result.hidden = false;
+            resultText.textContent =
+                "Please wait while EduGenie prepares your learning result.";
+
+            try {
+                const response = await fetch(endpoint, options);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "The request could not be completed."
+                    );
+                }
+
+                if (selectedActivity === "quiz") {
+                    if (!Array.isArray(data.quiz)) {
+                        throw new Error("The quiz response format was unexpected.");
+                    }
+
+                    resultText.textContent = data.quiz.map((item, index) => {
+                        const choices = Array.isArray(item.options)
+                            ? item.options : [];
+
+                        return "Question " + (index + 1) + ": " +
+                            item.question + "\n\n" +
+                            choices.map((option, i) =>
+                                String.fromCharCode(65 + i) + ". " + option
+                            ).join("\n") +
+                            "\n\nCorrect answer: " + item.answer;
+                    }).join("\n\n--------------------\n\n");
+                } else {
+                    resultText.textContent =
+                        data[resultKey] || "No result was returned.";
+                }
+            } catch (error) {
+                resultText.textContent =
+                    "We couldn't complete your request.\n\n" +
+                    error.message +
+                    "\n\nPlease check the server, API key, internet connection, and Gemini quota.";
+            } finally {
+                button.disabled = false;
+                button.innerHTML = 'Start learning <span>→</span>';
+            }
+        });
+    </script>
+</body>
+</html>
